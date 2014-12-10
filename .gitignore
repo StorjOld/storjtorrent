@@ -1,3 +1,6 @@
+# Notes
+notes.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -9,6 +12,7 @@ __pycache__/
 .Python
 env/
 build/
+src/
 develop-eggs/
 dist/
 downloads/

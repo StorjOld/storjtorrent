@@ -42,3 +42,13 @@ You may also need to have XCode's command line tools installed if you don't alre
 ## Windows
 
 If you are on Windows, after you install Boost and libtorrent, you can use [installation packages](http://sourceforge.net/projects/libtorrent/files/py-libtorrent/) provided by the libtorrent project to install the Python bindings.
+
+# Usage
+
+## Generate a New Torrent File
+
+    from storjtorrent import StorjTorrent as st
+
+    st.generate_torrent([], shard_directory='../storj/data/myshards')
+
+`generate_torrent()` is a static method you can use to generate a torrent file from a specified folder. At a minimum, you will need to define the folder location. Additional parameters include `piece_size`, `pad_size_limit`, `flags`, `comment`, `creator`, `private`, `bootstrap_node`, `bootstrap_port`, `torrent_name` and `verbose`.

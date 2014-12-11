@@ -1,6 +1,9 @@
 # Notes
 notes.txt
 
+# Generated torrent files.
+*.torrent
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

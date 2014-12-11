@@ -30,11 +30,10 @@ import sys
 
 
 class StorjTorrent(object):
-
     """Python libtorrent abstraction interface for Storj nodes."""
 
     def __init__(self):
-        """Initialize StorjTorrent with supplied settings."""
+        """Initialize StorjTorrent with supplied parameters."""
         pass
 
     @staticmethod

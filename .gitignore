@@ -1,6 +1,9 @@
 # Notes
 notes.txt
 
+# SublimeText3
+*.sublime-*
+
 # Generated torrent files.
 *.torrent
 

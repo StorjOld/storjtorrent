@@ -104,6 +104,8 @@ class Session(object):
         self.handles = []
         self.alerts = []
 
+        self.alive = True
+
     def add_torrent(self, torrent_location, max_connections=60,
                     max_uploads=-1):
         """ Add a new torrent to be managed by the libtorrent session.
@@ -163,3 +165,35 @@ class Session(object):
         self.handles.append(handles)
         handles.set_max_connections(max_connections)
         handles.set_max_uploads(max_uploads)
+
+    def reannounce(self):
+        """ Reannounce this torrent to DHT immediately.
+
+        We aren't using trackers for StorjTorrent, otherwise we would use
+        force_reannounce() instead.
+        """
+        for handle in self.handles:
+            handle.force_dht_announce()
+
+    def set_alive(self, alive):
+        """Indicate whether the session should actively handle torrents or not.
+
+        When a session object is first created, alive is set to True by default
+        so you do not need to set it again. You'd only need to reset it after
+        changing alive to False.
+
+        :param alive: Boolean value indicating whether session should manage
+                      assigned torrents.
+        :type alive: bool
+        """
+        self.alive = alive
+
+    def pause(self):
+        """Pauses all torrents handled by this session."""
+        for handle in handles:
+            handle.pause()
+
+    def resume(self):
+        """Resumes all torrents handled by this session."""
+        for handle in handles:
+            handle.resume()

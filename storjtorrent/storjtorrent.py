@@ -36,6 +36,12 @@ class StorjTorrent(object):
         """Initialize StorjTorrent with supplied parameters."""
         pass
 
+    def start_seeding(self):
+        pass
+
+    def stop_seeding(self):
+        pass
+
     @staticmethod
     def generate_torrent(self, shard_directory, piece_size=0,
                          pad_size_limit=4 * 1024 * 1024, flags=1,

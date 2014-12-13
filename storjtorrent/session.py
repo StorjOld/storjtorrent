@@ -26,6 +26,7 @@
 from .exception import StorjTorrentError
 from .version import __version__
 import libtorrent as lt
+import os
 
 
 class Session(object):
@@ -34,7 +35,8 @@ class Session(object):
 
     def __init__(self, port_min=6881, port_max=6891, max_download_rate=0,
                  max_upload_rate=0, save_path='.', allocation_mode='compact',
-                 proxy_host='', alert_mask=0xfffffff):
+                 proxy_host='', alert_mask=0xfffffff, verbose=False,
+                 global_max_connections=):
         """Initialize libtorrent session with supplied parameters.
 
         :param port: Listening port.
@@ -60,6 +62,8 @@ class Session(object):
                             default only errors are reported. It is a bitmask
                             where each bit represents a category of alerts.
         :type alert_mask: int (bitmask)
+        :param verbose: Indicate if actions should be made verbosely or not.
+        :type verbose: bool
         """
         if port_min < 0 or port_min > 65525 or not isinstance(port_min, int):
             raise StorjTorrentError(
@@ -99,3 +103,63 @@ class Session(object):
 
         self.handles = []
         self.alerts = []
+
+    def add_torrent(self, torrent_location, max_connections=60,
+                    max_uploads=-1):
+        """ Add a new torrent to be managed by the libtorrent session.
+
+        :param torrent_location: The location of the torrent file. Torrent file
+                                 may be located on the local file system or
+                                 remotely accessible via the magnet or
+                                 http/https protocols.
+        :type torrent_location: str
+        :param max_connections: Sets the maximum number of connections this
+                                torrent will open. If all connections are used
+                                up, incoming connections may be refused or poor
+                                connetions may be closed. This value must be at
+                                least 2. If -1 is given to the function, it
+                                means unlimited. There may also be a global
+                                limit on the number of connections which may be
+                                set using `connections_limit` in self.settings.
+        :type max_connections: int
+        :param max_uploads: Sets the maximum number of peers that are unchoked
+                            at the same time on this torrent. If you set this
+                            to -1, there will be no limit. The global maximum
+                            upload limit may be set using `unchoke_slots_limit`
+                            in self.settings.
+        :type max_uploads: int
+        """
+
+        if max_connections < 2 and max_connections not -1
+        or not isinstance(max_connections, int):
+            raise StorjTorrentError(
+                'You must have at least two connections per torrent.')
+
+        atp = {}
+        atp['save_path'] = self.save_path
+        atp['storage_mode'] = lt.storage_mode_t.storage_mode_sparse
+        atp['paused'] = False
+        atp['auto_managed'] = True
+        atp['duplicate_is_error'] = True
+
+        if (torrent_location.startswith('magnet:') or
+            torrent_location.startswith('http://') or
+                torrent_location.startswith('https://')):
+            atp['url'] = torrent_location
+        else:
+            torrent_info = lt.torrent_info(torrent_location)
+            if self.verbose:
+                print('Adding \'%s\'...' % torrent_info.name())
+            try:
+                resume_path = ''.join(
+                    [self.save_path, torrent_info.name(), '.fastresume'])
+                atp['resume_data'] = open(
+                    os.path.join(resume_path), 'rb').read()
+            except:
+                pass
+            atp['ti'] = torrent_info
+
+        handles = self.session.add_torrent(atp)
+        self.handles.append(handles)
+        handles.set_max_connections(max_connections)
+        handles.set_max_uploads(max_uploads)

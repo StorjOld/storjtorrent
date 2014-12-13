@@ -36,8 +36,7 @@ class Session(object):
 
     def __init__(self, port_min=6881, port_max=6891, max_download_rate=0,
                  max_upload_rate=0, save_path='.', allocation_mode='compact',
-                 proxy_host='', alert_mask=0xfffffff, verbose=False,
-                 global_max_connections=):
+                 proxy_host='', alert_mask=0xfffffff, verbose=False):
         """Initialize libtorrent session with supplied parameters.
 
         :param port: Listening port.
@@ -136,8 +135,8 @@ class Session(object):
         :type max_uploads: int
         """
 
-        if max_connections < 2 and max_connections not -1
-        or not isinstance(max_connections, int):
+        if (max_connections < 2 and max_connections is not -1 or
+                max_connections is not isinstance(max_connections, int)):
             raise StorjTorrentError(
                 'You must have at least two connections per torrent.')
 

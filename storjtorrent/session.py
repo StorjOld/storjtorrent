@@ -25,6 +25,7 @@
 
 from .exception import StorjTorrentError
 from .version import __version__
+from multiprocessing import Process
 import libtorrent as lt
 import os
 
@@ -105,6 +106,9 @@ class Session(object):
         self.alerts = []
 
         self.alive = True
+        p = Process(target=self.manage_torrents)
+        p.start()
+        p.join()
 
     def add_torrent(self, torrent_location, max_connections=60,
                     max_uploads=-1):
@@ -186,14 +190,37 @@ class Session(object):
                       assigned torrents.
         :type alive: bool
         """
-        self.alive = alive
+        if self.alive is True and alive is False:
+            self.alive = False
+            self._sleep()
+        elif self.alive is False and alive is True:
+            self.alive = True
+            p = Process(target=self.manage_torrents)
+            p.start()
+            p.join()
 
     def pause(self):
         """Pauses all torrents handled by this session."""
-        for handle in handles:
+        for handle in self.handles:
             handle.pause()
 
     def resume(self):
         """Resumes all torrents handled by this session."""
-        for handle in handles:
+        for handle in self.handles:
             handle.resume()
+
+    def _sleep(self):
+        """Halt session management of torrents and write resume data."""
+        self.pause()
+        for handle in self.handles:
+            if not handle.is_valid() or not handle.has_metadata():
+                continue
+            data = lt.bencode(handle.write_resume_data())
+            resume_path = os.path.join(self.save_path, ''.join(
+                [handle.get_torrent_info().name(), '.fastresume']))
+            open(resume_path, 'wb').write(data)
+
+    def manage_torrents(self):
+        """Manage all torrents assigned to the session."""
+        while self.alive:
+            pass

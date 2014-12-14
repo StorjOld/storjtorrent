@@ -68,6 +68,10 @@ class StorjTorrent(object):
         if len(self.session.handles) is 0:
             self.session.set_alive(False)
 
+    def halt_session(self):
+        """Manually halt an associated torrent management session."""
+        self.session.set_alive(False)
+
     def get_status(self):
         """Retrieve the current session status.
 

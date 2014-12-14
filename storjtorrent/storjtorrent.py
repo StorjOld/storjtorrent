@@ -52,7 +52,7 @@ class StorjTorrent(object):
         """
         if not self.session.alive:
             self.session.set_alive(True)
-        self.session.add_torent(torrent_path, seeding=seeding)
+        self.session.add_torrent(torrent_path, seeding=seeding)
 
     def remove_torrent(self, hash, delete_files=False):
         """Remove a torrent from a session by hash and indicate if you want to

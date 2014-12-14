@@ -105,9 +105,8 @@ class Session(object):
         self.alerts = []
 
         self.alive = True
-        p = Process(target=self.manage_torrents)
+        p = Process(target=self._manage_torrents)
         p.start()
-        p.join()
 
     def add_torrent(self, torrent_location, max_connections=60,
                     max_uploads=-1):
@@ -194,9 +193,8 @@ class Session(object):
             self._sleep()
         elif self.alive is False and alive is True:
             self.alive = True
-            p = Process(target=self.manage_torrents)
+            p = Process(target=self._manage_torrents)
             p.start()
-            p.join()
 
     def pause(self):
         """Pauses all torrents handled by this session."""
@@ -219,7 +217,8 @@ class Session(object):
                 [handle.get_torrent_info().name(), '.fastresume']))
             open(resume_path, 'wb').write(data)
 
-    def manage_torrents(self):
+    def _manage_torrents(self):
         """Manage all torrents assigned to the session."""
         while self.alive:
             pass
+

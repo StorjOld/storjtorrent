@@ -171,6 +171,8 @@ class Session(object):
         atp['paused'] = False
         atp['auto_managed'] = True
         atp['duplicate_is_error'] = True
+        if seeding:
+            atp['super_seeding'] = True
 
         if (torrent_location.startswith('magnet:') or
             torrent_location.startswith('http://') or

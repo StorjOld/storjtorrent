@@ -24,25 +24,43 @@
 # SOFTWARE.
 
 from .exception import StorjTorrentError
+import session
 import libtorrent as lt
 import os
 import sys
 
 
 class StorjTorrent(object):
+
     """Python libtorrent abstraction interface for Storj nodes."""
 
     def __init__(self):
-        """Initialize StorjTorrent with supplied parameters."""
-        pass
+        """Initialize StorjTorrent and associated session."""
+        self.session = session.Session()
 
-    def start_seeding(self):
-        # start session if not one, make sure it is alive if there is one
-        pass
+    def add_torrent(self, torrent_path, seeding):
+        """Add a torrent to be managed by the StorjTorrent session.
 
-    def stop_seeding(self):
-        # stop seeding this specific torrent, if there are no more torrents/handlers, set alive to false
-        pass
+        If you are seeding a torrent you created, set seeding to True.
+
+        :param torrent_path: The local path, magnet or URL of the torrent you
+                             wish to add.
+        :type torrent_path: str
+        :param seeding: Whether or not you are seeding a torrent, usually one
+                        you created.
+        :type seeding: bool
+        """
+        if not self.session.alive:
+            self.session.set_alive(True)
+        self.session.add_torent(torrent_path, seeding=seeding)
+
+    def remove_torrent(self, hash, delete_files=False):
+        """Remove a torrent from a session by hash and indicate if you want to
+        delete associated files.
+        """
+        self.session.remove_torrent(hash, delete_files=delete_files)
+        if len(self.session.handles) is 0:
+            self.session.set_alive(False)
 
     @staticmethod
     def generate_torrent(self, shard_directory, piece_size=0,

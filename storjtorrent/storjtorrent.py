@@ -37,9 +37,11 @@ class StorjTorrent(object):
         pass
 
     def start_seeding(self):
+        # start session if not one, make sure it is alive if there is one
         pass
 
     def stop_seeding(self):
+        # stop seeding this specific torrent, if there are no more torrents/handlers, set alive to false
         pass
 
     @staticmethod

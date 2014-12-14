@@ -16,6 +16,7 @@ You will need to ensure [Boost](http://www.boost.org/) is properly installed so 
 After Boost is successfully built, you can build and install `libtorrent`:
 
     $ wget http://downloads.sourceforge.net/project/libtorrent/libtorrent/libtorrent-rasterbar-1.0.3.tar.gz
+    $ tar -zxvf libtorrent-*.tar.gz
     $ cd libtorrent-rasterbar-1.0.3
     $ ./configure --enable-python-binding
     $ make
@@ -28,16 +29,31 @@ You may also need to run:
 
 ## OSX
 
+You may need to have XCode's command line tools installed if you don't already have them set up:
+
+    $ xcode-select --install
+
 If you are using OSX, you can use the [Homebrew](http://brew.sh/) system to install Boost (with Python support) and libtorrent:
 
     $ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     $ brew install boost-python 
     $ brew install libtorrent-rasterbar --with-python
 
-You may also need to have XCode's command line tools installed if you don't already have them set up:
+### Installing Inside a Virtual Environment
 
-    $ xcode-select --install
+If you are installing inside a virtual environment, you can try the following (after you install boost-python with homebrew):
 
+    $ brew install boost-build
+    $ wget http://downloads.sourceforge.net/project/libtorrent/libtorrent/libtorrent-rasterbar-1.0.3.tar.gz
+    $ tar -zxvf libtorrent-*.tar.gz
+    $ cd libtorrent-rasterbar-1.0.3
+    $ ./configure --disable-debug --disable-dependency-tracking --disable-silent-rules --enable-encryption --prefix=$VIRTUAL_ENV --with-boost=/usr/local/opt/boost --enable-python-binding --with-libiconv --with-boost-python=boost_python-mt PYTHON=python PYTHON_LDFLAGS="$(python-config --libs)"
+    $ make
+    $ make install
+
+If you have problems, try ensuring your virtual environment uses Brew's python:
+
+    $ mkvirtualenv -p /usr/local/bin/python storjtorrent
 
 ## Windows
 

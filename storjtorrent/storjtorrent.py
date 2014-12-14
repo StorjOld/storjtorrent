@@ -154,7 +154,7 @@ class StorjTorrent(object):
         torrent.set_comment(comment)
         torrent.set_creator(creator)
         torrent.set_priv(private)
-        torrent.add_node(bootstrap_node, bootstrap_port)
+        torrent.add_dht_router(bootstrap_node, bootstrap_port)
 
         if verbose:
             sys.stderr.write('Setting piece hashes.')

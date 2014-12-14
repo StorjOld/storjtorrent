@@ -25,7 +25,7 @@
 
 from .exception import StorjTorrentError
 from .version import __version__
-from multiprocessing import Process
+from multiprocessing.dummy import Process
 import libtorrent as lt
 import os
 

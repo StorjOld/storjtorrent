@@ -93,6 +93,8 @@ class Session(object):
             self.max_upload_rate = 1000 * max_upload_rate
         self.status_update_interval = status_update_interval
 
+        self.save_path = os.path.abspath(save_path)
+        self.verbose = verbose
         self.compact_allocation = allocation_mode == 'compact'
 
         self.settings = lt.session_settings()
@@ -113,7 +115,7 @@ class Session(object):
             self.session.set_proxy(proxy_settings)
 
         self.handles = []
-        self._status = {}
+        self._status = {'torrents': {}, 'alerts': {}}
 
         self.alive = True
         p = Process(target=self._watch_torrents)
@@ -161,7 +163,7 @@ class Session(object):
         """
 
         if (max_connections < 2 and max_connections is not -1 or
-                max_connections is not isinstance(max_connections, int)):
+                not isinstance(max_connections, int)):
             raise StorjTorrentError(
                 'You must have at least two connections per torrent.')
 
@@ -291,12 +293,8 @@ class Session(object):
 
                 if self.verbose:
                     sys.stdout.flush()
-                    print(('\r%.2f%% complete (down: %.1f kB/s up: %.1f kB/s ')
-                          ('peers: %d) %s') % (status.progress * 100,
-                                               status.download_rate / 1000,
-                                               status.upload_rate / 1000,
-                                               status.num_peers,
-                                               state_str[status.state]),
+                    print(('\r%.2f%% complete (down: %.1f kB/s up: %.1f kB/s peers: %d) %s') % (status.progress * 100,
+                        status.download_rate / 1000, status.upload_rate / 1000, status.num_peers, state_str[status.state]),
                           end=' ')
                     alerts = self.session.pop_alerts()
                     for alert in alerts:

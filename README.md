@@ -41,6 +41,10 @@ If you are using OSX, you can use the [Homebrew](http://brew.sh/) system to inst
 
 ### Installing Inside a Virtual Environment
 
+Ensure your virtual environment is using Brew's python:
+
+    $ mkvirtualenv -p /usr/local/bin/python storjtorrent
+
 If you are installing inside a virtual environment, you can try the following (after you install boost-python with homebrew):
 
     $ brew install boost-build
@@ -50,10 +54,6 @@ If you are installing inside a virtual environment, you can try the following (a
     $ ./configure --disable-debug --disable-dependency-tracking --disable-silent-rules --enable-encryption --prefix=$VIRTUAL_ENV --with-boost=/usr/local/opt/boost --enable-python-binding --with-libiconv --with-boost-python=boost_python-mt PYTHON=python PYTHON_LDFLAGS="$(python-config --libs)"
     $ make
     $ make install
-
-If you have problems, try ensuring your virtual environment uses Brew's python:
-
-    $ mkvirtualenv -p /usr/local/bin/python storjtorrent
 
 ## Windows
 

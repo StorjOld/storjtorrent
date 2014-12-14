@@ -40,7 +40,8 @@ class Session(object):
 
     def __init__(self, port_min=6881, port_max=6891, max_download_rate=0,
                  max_upload_rate=0, save_path='.', allocation_mode='compact',
-                 proxy_host='', alert_mask=0xfffffff, verbose=False):
+                 proxy_host='', alert_mask=0xfffffff, verbose=False,
+                 status_update_interval=0.5):
         """Initialize libtorrent session with supplied parameters.
 
         :param port: Listening port.
@@ -68,6 +69,11 @@ class Session(object):
         :type alert_mask: int (bitmask)
         :param verbose: Indicate if actions should be made verbosely or not.
         :type verbose: bool
+        :param status_update_interval: The interval at which the session should
+                                       update the status dictionary with
+                                       current information about the torrents
+                                       it is managing.
+        :type status_update_interval: int or float
         """
         if port_min < 0 or port_min > 65525 or not isinstance(port_min, int):
             raise StorjTorrentError(
@@ -85,6 +91,7 @@ class Session(object):
             self.max_upload_rate = -1
         else:
             self.max_upload_rate = 1000 * max_upload_rate
+        self.status_update_interval = status_update_interval
 
         self.compact_allocation = allocation_mode == 'compact'
 
@@ -106,10 +113,10 @@ class Session(object):
             self.session.set_proxy(proxy_settings)
 
         self.handles = []
-        self.alerts = []
+        self._status = {}
 
         self.alive = True
-        p = Process(target=self._manage_torrents)
+        p = Process(target=self._watch_torrents)
         p.start()
 
     def add_torrent(self, torrent_location, max_connections=60,
@@ -167,10 +174,10 @@ class Session(object):
                 pass
             atp['ti'] = torrent_info
 
-        handles = self.session.add_torrent(atp)
-        self.handles.append(handles)
-        handles.set_max_connections(max_connections)
-        handles.set_max_uploads(max_uploads)
+        handle = self.session.add_torrent(atp)
+        self.handles.append(handle)
+        handle.set_max_connections(max_connections)
+        handle.set_max_uploads(max_uploads)
 
     def reannounce(self):
         """ Reannounce this torrent to DHT immediately.
@@ -197,7 +204,7 @@ class Session(object):
             self._sleep()
         elif self.alive is False and alive is True:
             self.alive = True
-            p = Process(target=self._manage_torrents)
+            p = Process(target=self._watch_torrents)
             p.start()
 
     def pause(self):
@@ -221,8 +228,62 @@ class Session(object):
                 [handle.get_torrent_info().name(), '.fastresume']))
             open(resume_path, 'wb').write(data)
 
-    def _manage_torrents(self):
-        """Manage all torrents assigned to the session."""
-        while self.alive:
-            pass
+    def get_status(self):
+        """Return current status of all torrents managed by this session."""
+        return self._status
 
+    def _watch_torrents(self):
+        """Watches all torrents assigned to the session and updates status
+        dictionary with relevant information.
+
+        The status dictionary is updated at the interval set by
+        status_update_interval. If verbose is set to True on the session
+        object, this method will also print and refresh the associated status
+        information at the given interval.
+        """
+        state_str = ['queued', 'checking', 'downloading metadata',
+                     'downloading', 'finished', 'seeding', 'allocating',
+                     'checking fastresume']
+
+        while self.alive:
+            for handle in self.handles:
+                if handle.has_metadata():
+                    name = handle.get_torrent_info().name()[:40]
+                else:
+                    name = ''.join(
+                        'torrent-', str(uuid.uuid4().fields[-1])[:5])
+
+                status = handle.status()
+
+                self._status['torrents'][name] = {
+                    'state_str': state_str[status.state],
+                    'progress': status.progress,
+                    'download_rate': status.download_rate / 1000,
+                    'upload_rate': status.upload_rate / 1000,
+                    'num_peers': status.num_peers,
+                    'num_seeds': status.num_seeds,
+                    'distributed_copies': status.distributed_copies
+                }
+
+                # Only capture errors.
+                self._status['alerts'] = [alert for alert in
+                                          self.session.pop_alerts() if
+                                          alert.category() and
+                                          lt.alert.category_t
+                                          .error_notification]
+
+                if self.verbose:
+                    sys.stdout.flush()
+                    print(('\r%.2f%% complete (down: %.1f kB/s up: %.1f kB/s ')
+                          ('peers: %d) %s') % (status.progress * 100,
+                                               status.download_rate / 1000,
+                                               status.upload_rate / 1000,
+                                               status.num_peers,
+                                               state_str[status.state]),
+                          end=' ')
+                    alerts = self.session.pop_alerts()
+                    for alert in alerts:
+                        if (alert.category() and
+                                lt.alert.category_t.error_notification):
+                            print(alert)
+                    time.sleep(self.status_update_interval)

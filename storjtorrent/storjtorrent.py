@@ -85,10 +85,9 @@ class StorjTorrent(object):
         :returns: The hash of the indicated torrent.
         :rtype: str
         """
-        torrent = open(torrent_path, 'rb').read()
-        info = lt.torrent_info(torrent, len(torrent))
-        info_hash = info.info_hash()
-        return str(info_hash)
+        decoded_torrent = lt.bdecode(open(torrent_path, 'rb').read())
+        info = lt.torrent_info(decoded_torrent)
+        return str(info.info_hash())
 
     @staticmethod
     def generate_torrent(self, shard_directory, piece_size=0,

@@ -57,10 +57,38 @@ class StorjTorrent(object):
     def remove_torrent(self, hash, delete_files=False):
         """Remove a torrent from a session by hash and indicate if you want to
         delete associated files.
+
+        :param hash: Torrent info hash for torrent you wish to remove.
+        :type hash: str
+        :param delete_files: Whether or not you wish to delete associated
+                             files.
+        :type delete_files: bool
         """
         self.session.remove_torrent(hash, delete_files=delete_files)
         if len(self.session.handles) is 0:
             self.session.set_alive(False)
+
+    def get_status(self):
+        """Retrieve the current session status.
+
+        :returns: Status of all torrents and error codes.
+        :rtype: dict
+        """
+        return self.session.get_status()
+
+    @staticmethod
+    def get_hash(self, torrent_path):
+        """Retrieve the SHA-1 hash of the selected torrent.
+        :param torrent_path: The path of the torrent you want to find the hash
+                             of.
+        :type torrent_path: str
+        :returns: The hash of the indicated torrent.
+        :rtype: str
+        """
+        torrent = open(torrent_path, 'rb').read()
+        info = lt.torrent_info(torrent, len(torrent))
+        info_hash = info.info_hash()
+        return str(info_hash)
 
     @staticmethod
     def generate_torrent(self, shard_directory, piece_size=0,

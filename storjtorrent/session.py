@@ -119,8 +119,23 @@ class Session(object):
         p = Process(target=self._watch_torrents)
         p.start()
 
+    def remove_torrent(self, torrent_hash, delete_files=False):
+        """Remove a torrent from being managed by the Session.
+
+        :param torrent_hash: The SHA-1 hash of the torrent you want to delete.
+        :type torrent_hash: str
+        :param delete_files: Indicate whether you also want to delete files
+                             associated with this torrent.
+        :type delete_files: bool
+        """
+        torrent_handle = self.session.find_torrent(torrent_hash)
+        if torrent_handle.is_valid():
+            self.session.remove_torrent(torrent_handle, delete_files)
+            self.handles = [handle for handle in self.handles
+                            if handle is not torrent_handle]
+
     def add_torrent(self, torrent_location, max_connections=60,
-                    max_uploads=-1):
+                    max_uploads=-1, seeding=False):
         """ Add a new torrent to be managed by the libtorrent session.
 
         :param torrent_location: The location of the torrent file. Torrent file

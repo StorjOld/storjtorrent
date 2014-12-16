@@ -301,4 +301,4 @@ class Session(object):
                         if (alert.category() and
                                 lt.alert.category_t.error_notification):
                             print(alert)
-                    time.sleep(self.status_update_interval)
+            time.sleep(self.status_update_interval)

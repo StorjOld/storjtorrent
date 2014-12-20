@@ -55,6 +55,41 @@ If you are installing inside a virtual environment, you can try the following (a
     $ make
     $ make install
 
+## Ubuntu
+
+Install supporting tools and libraries:
+
+    $ apt-get install build-essential
+    $ apt-get install source python-libtorrent
+    $ apt-get build-dep python-libtorrent
+
+Create a new virtual environment. For example, if you have `virtualenvwrapper` installed, you can use the following to create and enter a new virtual environment called `storjtorrent`:
+
+    $ mkvirtualenv storjtorrent
+
+Then, once inside the virtual environment, run the following commands:
+
+    $ wget http://downloads.sourceforge.net/project/libtorrent/libtorrent/libtorrent-rasterbar-1.0.3.tar.gz
+    $ tar -zxvf libtorrent-rasterbar-1.0.3.tar.gz
+    $ cd libtorrent-rasterbar-1.0.3
+    $ ./configure --with-boost-python --enable-dht --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-python-binding
+    $ make
+    $ make install
+    $ cd bindings/python
+    $ python setup.py build
+    $ python setup.py install
+    $ export LD_LIBRARY_PATH=/usr/local/lib/
+
+### Compiling Issues
+
+If g++ freezes or errors while building libtorrent, you may not have enough memory on your instance (can be a problem with small Digital Ocean instances). You can try to bypass this issue by creating and enabling a swap file at least 1GB in size:
+
+    $ dd if=/dev/zero of=/var/swap.img bs=1024k count=1000
+    $ mkswap /var/swap.img
+    $ swapon /var/swap.img
+
+Then, try building again.
+
 ## Windows
 
 If you are on Windows, after you install Boost and libtorrent, you can use [installation packages](http://sourceforge.net/projects/libtorrent/files/py-libtorrent/) provided by the libtorrent project to install the Python bindings.
@@ -68,3 +103,5 @@ If you are on Windows, after you install Boost and libtorrent, you can use [inst
     st.generate_torrent([], shard_directory='../storj/data/myshards')
 
 `generate_torrent()` is a static method you can use to generate a torrent file from a specified folder. At a minimum, you will need to define the folder location. Additional parameters include `piece_size`, `pad_size_limit`, `flags`, `comment`, `creator`, `private`, `bootstrap_node`, `bootstrap_port`, `torrent_name` and `verbose`.
+
+TODO: Document all methods.

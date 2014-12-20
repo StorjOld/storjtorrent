@@ -41,7 +41,9 @@ class Session(object):
     def __init__(self, port_min=6881, port_max=6891, max_download_rate=0,
                  max_upload_rate=0, save_path='.', allocation_mode='compact',
                  proxy_host='', alert_mask=0xfffffff, verbose=False,
-                 status_update_interval=0.5):
+                 status_update_interval=0.5,
+                 bootstrap_node='router.bittorrent.com',
+                 bootstrap_port=6881):
         """Initialize libtorrent session with supplied parameters.
 
         :param port: Listening port.
@@ -74,7 +76,12 @@ class Session(object):
                                        current information about the torrents
                                        it is managing.
         :type status_update_interval: int or float
+        :param bootstrap_node: Boostrap DHT router to connect to.
+        :type boostrap_node: str
+        :param bootstrap_port: Port of boostrap DHT router to connect to.
+        :type bootstrap_port: int
         """
+
         if port_min < 0 or port_min > 65525 or not isinstance(port_min, int):
             raise StorjTorrentError(
                 'port_min must be an integer value between 0 and 65525.')
@@ -106,6 +113,7 @@ class Session(object):
         self.session.listen_on(port_min, port_max)
         self.session.set_settings = self.settings
         self.session.set_alert_mask(alert_mask)
+        self.session.add_dht_router(bootstrap_node, bootstrap_port)
 
         if proxy_host is not '':
             proxy_settings = lt.proxy_settings()

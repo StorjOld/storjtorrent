@@ -38,6 +38,7 @@ class StorjTorrent(object):
         """Initialize StorjTorrent and associated session."""
         self.session = session.Session()
 
+
     def add_torrent(self, torrent_path, seeding):
         """Add a torrent to be managed by the StorjTorrent session.
 
@@ -97,8 +98,7 @@ class StorjTorrent(object):
     def generate_torrent(self, shard_directory, piece_size=0,
                          pad_size_limit=4 * 1024 * 1024, flags=1,
                          comment='Storj - Be the Cloud.', creator='Storj',
-                         private=False, bootstrap_node='router.bittorrent.com',
-                         bootstrap_port=6881, torrent_name='storj.torrent',
+                         private=False, torrent_name='storj.torrent',
                          verbose=False):
         """Creates a torrent with specified files.
 
@@ -123,6 +123,19 @@ class StorjTorrent(object):
                                doesn't make sense to set this any lower than
                                4kiB.
         :type pad_size_limit: int
+        :param flags: Specifies options for the torrent creation.
+        :type flags: int
+        :param comment: Comment to be associated with torrent.
+        :type comment: str
+        :param creator: Creator to be associated with torrent.
+        :type creator: str
+        :param private: Whether torrent should be private or not. Should be
+                        false for DHT.
+        :type private: bool
+        :param torrent_name: The filename for your torrent.
+        :type torrent_name: str
+        :param verbose: Indicate if actions should be made verbosely or not.
+        :type verbose: bool
         """
 
         if piece_size % 16384 is not 0:
@@ -154,8 +167,6 @@ class StorjTorrent(object):
         torrent.set_comment(comment)
         torrent.set_creator(creator)
         torrent.set_priv(private)
-
-        self.session.session.add_dht_router(bootstrap_node, bootstrap_port)
 
         if verbose:
             sys.stderr.write('Setting piece hashes.')

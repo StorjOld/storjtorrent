@@ -72,11 +72,12 @@ Then, once inside the virtual environment, run the following commands:
     $ wget http://downloads.sourceforge.net/project/libtorrent/libtorrent/libtorrent-rasterbar-1.0.3.tar.gz
     $ tar -zxvf libtorrent-rasterbar-1.0.3.tar.gz
     $ cd libtorrent-rasterbar-1.0.3
-    $ ./configure --with-boost-python --enable-dht --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-python-binding
+    $ ./configure --disable-debug --disable-dependency-tracking --disable-silent-rules --enable-encryption --prefix=$VIRTUAL_ENV --with-boost-python --enable-dht --with-libiconv --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-python-binding PYTHON=python PYTHON_LDFLAGS="$(python-config --libs)"
     $ make
     $ make install
-    $ cd bindings/python
-    $ python setup.py build
+
+You may also need to run:
+
     $ python setup.py install
     $ export LD_LIBRARY_PATH=/usr/local/lib/
 

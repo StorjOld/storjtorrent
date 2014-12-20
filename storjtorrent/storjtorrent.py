@@ -38,7 +38,6 @@ class StorjTorrent(object):
         """Initialize StorjTorrent and associated session."""
         self.session = session.Session()
 
-
     def add_torrent(self, torrent_path, seeding):
         """Add a torrent to be managed by the StorjTorrent session.
 

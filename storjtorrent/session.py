@@ -294,7 +294,7 @@ class Session(object):
                 if self.verbose:
                     sys.stdout.flush()
                     print(('\r%.2f%% complete (down: %.1f kB/s up: %.1f kB/s peers: %d) %s') % (status.progress * 100,
-                        status.download_rate / 1000, status.upload_rate / 1000, status.num_peers, state_str[status.state]),
+                                                                                                status.download_rate / 1000, status.upload_rate / 1000, status.num_peers, state_str[status.state]),
                           end=' ')
                     alerts = self.session.pop_alerts()
                     for alert in alerts:

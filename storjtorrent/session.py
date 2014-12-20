@@ -293,7 +293,7 @@ class Session(object):
                 }
 
                 # Only capture errors.
-                self._status['alerts'] = [alert for alert in
+                self._status['alerts'] = [alert.message() for alert in
                                           self.session.pop_alerts() if
                                           alert.category() and
                                           lt.alert.category_t

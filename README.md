@@ -99,10 +99,48 @@ If you are on Windows, after you install Boost and libtorrent, you can use [inst
 
 ## Generate a New Torrent File
 
-    from storjtorrent import StorjTorrent as st
+    >>> from storjtorrent import StorjTorrent as st
 
-    st.generate_torrent([], shard_directory='../storj/data/myshards')
+    >>> st.generate_torrent([], shard_directory='../storj/data/myshards')
 
 `generate_torrent()` is a static method you can use to generate a torrent file from a specified folder. At a minimum, you will need to define the folder location. Additional parameters include `piece_size`, `pad_size_limit`, `flags`, `comment`, `creator`, `private`, `bootstrap_node`, `bootstrap_port`, `torrent_name` and `verbose`.
 
-TODO: Document all methods.
+## Retrieve Hash of Torrent File
+
+    >>> from storjtorrent import StorjTorrent as st
+
+    >>> st.get_hash([], '../path/to/your/torrentfile')
+    'e90e06f2a2461801ac6f7a4b4bccd7f1f16393d3'
+
+`get_hash()` retrieves the SHA1 hash of the specified torrent file. This hash can be used with a magnet link to let others find and download your torrent via DHT. For example, if the command returns `e90e06f2a2461801ac6f7a4b4bccd7f1f16393d3`, you could use a corresponding magnet link of `magnet:?xt=urn:btih:e90e06f2a2461801ac6f7a4b4bccd7f1f16393d3`.
+
+## Adding a Torrent to the Session
+
+    >>> from storjtorrent import StorjTorrent
+
+    >>> st = StorjTorrent()
+    >>> st.add_torrent([], '../path/to/your/torrentfile', True)
+
+Once you create a `StorjTorrent()` object, a torrent management session is automatically created for you and awaits the addition of a torrent. The first string parameter is the local path, magnet link or URL of the torrent you wish to add. The boolean parameter indicates whether you are seeding a torrent you created (and have all the data for). By setting `seeding=True`, you enable [super-seeding](https://en.wikipedia.org/wiki/Super-seeding). 
+
+## Removing a Torrent from the Session
+
+    >>> st.remove_torrent([], 'e90e06f2a2461801ac6f7a4b4bccd7f1f16393d3', delete_files=false)
+
+`remove_torrent()` indicates that StorjTorrent should no longer be managing this torrent. You can indicate which torrent to stop managing by passing its corresponding SHA1 hash (which can be determined using `get_hash()`). You also have the option of deleting all associated torrent data files or not.
+
+## Halting a Session
+
+    >>> st.halt_session()
+
+`halt_session()` indicates that StorjTorrent should sleep or stop actively managing torrents. StorjTorrent attempts to automatically manage its sleep state most of the time. For example, if you remove the 'last' torrent that StorjTorrent was managing, it will automatically put itself to sleep. If you then add a new torrent, it will 'wake up' again. 
+
+It is important to use `halt_session()` before you terminate a process using StorjTorrent as the session management is running in a separate thread and won't be terminated automatically if it is still managing torrents.
+
+
+## Retrieving Status of Torrents and Alerts
+
+    >>> st.get_status()
+    {'alerts': ['incoming dht get_peers: ce90f455c3b4928d66006f569b16e2018e405fd2'], 'torrents': {'fake': {'download_rate': 0, 'distributed_copies': -1.0, 'state_str': 'seeding', 'upload_rate': 0, 'progress': 1.0, 'num_peers': 0, 'num_seeds': 0}}}
+
+`get_status()` returns a dictionary with with an array of `alerts` and sub-dictionary of torrent statuses. The status dictionary updates every five seconds (though this can be reconfigured). The alerts indicate recent events occuring with StorjTorrent (passed via libtorrent), such as new DHT peers. The `torrents` dictionary contains information about each torrent that StorjTorrent is managing. It in cludes information such as download rate, upload rate, state (e.g. seeding, downloading, uploading, etc.) and overall progress.

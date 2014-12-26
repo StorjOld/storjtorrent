@@ -47,6 +47,7 @@ Ensure your virtual environment is using Brew's python:
 
 If you are installing inside a virtual environment, you can try the following (after you install boost-python with homebrew):
 
+    $ brew install boost --with-python
     $ brew install boost-build
     $ wget http://downloads.sourceforge.net/project/libtorrent/libtorrent/libtorrent-rasterbar-1.0.3.tar.gz
     $ tar -zxvf libtorrent-*.tar.gz

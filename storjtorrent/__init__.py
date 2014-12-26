@@ -25,3 +25,4 @@
 
 from storjtorrent import *
 from session import *
+from exception import *

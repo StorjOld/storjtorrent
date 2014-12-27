@@ -26,6 +26,8 @@
 from storjtorrent import Session
 from storjtorrent import StorjTorrentError
 import pytest
+import threading
+import multiprocessing
 
 
 @pytest.fixture(scope='class')
@@ -39,6 +41,10 @@ def default_session(request):
 
 
 class TestSession:
+
+    def session_thread_count(self):
+        return [isinstance(thread, multiprocessing.dummy.DummyProcess) for
+                thread in threading.enumerate()].count(True)
 
     @pytest.mark.parametrize('min', [-1, 65526, 'shoe'])
     def test_init_port_min(self, min):
@@ -88,3 +94,29 @@ class TestSession:
         assert proxy.hostname == 'loveboat.org'
         assert proxy.port == 8123
         s.set_alive(False)
+
+    def test_set_alive_from_alive_to_dead(self, default_session):
+        default_session.set_alive(False)
+        assert default_session.alive is False
+
+    def test_set_alive_from_dead_to_alive(self, default_session):
+        default_session.set_alive(False)
+        thread_count = self.session_thread_count()
+        default_session.set_alive(True)
+        assert self.session_thread_count() is thread_count + 1
+        assert default_session.alive is True
+
+# test: remove torrent
+# test: add torrent w/ bad max connections
+# test: add torrent w/ good max connections and seeding
+# test: add torrent w/ magnet and seeding/not seeding:
+# test: add torrent w/ http and https seeding/not seeding:
+# test: add torrent w/ fastresume
+# test: add torrent w/ verbose
+# test: reannounce
+# test: pause
+# test: resume
+# test: sleep (and see that fastresume written)
+# test: get_status returns status
+# test: watch_torrents w/ verbose and w/out verbose  for 20 seconds
+# test: watch_torrents for handles w/ and w/out metadata (e.g. magnets)

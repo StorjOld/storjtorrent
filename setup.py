@@ -39,6 +39,7 @@ test_requirements = [
     'pytest',
     'pytest-pep8',
     'pytest-cache',
+    'pytest-timeout',
     'coveralls'
 ]
 

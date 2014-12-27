@@ -278,7 +278,7 @@ class Session(object):
                     name = handle.get_torrent_info().name()[:40]
                 else:
                     name = ''.join(
-                        'torrent-', str(uuid.uuid4().fields[-1])[:5])
+                        ['torrent-', str(uuid.uuid4().fields[-1])[:5]])
 
                 status = handle.status()
 

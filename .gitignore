@@ -4,9 +4,6 @@ notes.txt
 # SublimeText3
 *.sublime-*
 
-# Generated torrent files.
-*.torrent
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

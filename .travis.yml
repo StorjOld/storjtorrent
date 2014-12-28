@@ -10,7 +10,7 @@ before_install:
   - 'wget http://downloads.sourceforge.net/project/libtorrent/libtorrent/libtorrent-rasterbar-1.0.3.tar.gz'
   - 'tar -zxvf libtorrent-rasterbar-1.0.3.tar.gz'
   - 'cd libtorrent-rasterbar-1.0.3'
-  - './configure --disable-debug --disable-dependency-tracking --disable-silent-rules --enable-encryption --with-boost-python --enable-dht --with-libiconv --with-boost-system=lib --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-python-binding PYTHON=python PYTHON_LDFLAGS="$(python-config --libs)"'
+  - './configure --disable-debug --disable-dependency-tracking --disable-silent-rules --enable-encryption --with-boost-python --enable-dht --with-libiconv --with-boost-system=/usr/lib/x86_64-linux-gnu/ --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-python-binding PYTHON=python PYTHON_LDFLAGS="$(python-config --libs)"'
   - 'sudo make'
   - 'sudo make install'
   - 'python setup.py install'

@@ -30,7 +30,6 @@ import libtorrent as lt
 import pytest
 import threading
 import os
-import pdb
 
 REMOTE_TORRENT = 'http://releases.ubuntu.com/14.04.1/'
 'ubuntu-14.04.1-desktop-amd64.iso.torrent'
@@ -41,26 +40,28 @@ REMOTE_MAGNET = ''.join(['magnet:?xt=urn:btih:', REMOTE_HASH])
 @pytest.fixture(scope='function', params=[True, False])
 def default_session(request):
     os.chdir('tests')
-    s = Session(verbose=request.param)
+    ds = Session(verbose=request.param)
 
     def fin():
-        s.set_alive(False)
+        ds.set_alive(False)
         os.chdir('../')
     request.addfinalizer(fin)
-    return s
+    return ds
 
 
 @pytest.fixture(scope='function', params=[True, False])
 def session_with_torrent(request):
     os.chdir('tests')
-    s = Session(verbose=request.param)
-    s.add_torrent('data.torrent', seeding=True)
+    swt = Session(verbose=request.param)
+    swt.add_torrent('data.torrent', seeding=True)
 
     def fin():
-        s.set_alive(False)
+        fr = 'data.fastresume'
+        swt.set_alive(False)
+        os.remove(fr) if os.path.exists(fr) else None
         os.chdir('../')
     request.addfinalizer(fin)
-    return s
+    return swt
 
 
 class TestSession:
@@ -167,14 +168,13 @@ class TestSession:
 
     def test_pause_torrents(self, session_with_torrent):
         session_with_torrent.pause()
-        assert session_with_torrent.handles[0].is_paused()
+        assert session_with_torrent.session.is_paused()
 
     def test_resume_torrents(self, session_with_torrent):
-        handle = session_with_torrent.handles[0]
         session_with_torrent.pause()
-        assert handle.is_paused()
-        session_with_torrent.resume()
-        assert not handle.is_paused()
+        assert session_with_torrent.session.is_paused()
+        session_with_torrent.session.resume()
+        assert not session_with_torrent.session.is_paused()
 
     def test_remove_torrent(self, session_with_torrent):
         assert len(session_with_torrent.handles) is 1
@@ -190,6 +190,10 @@ class TestSession:
         assert session_with_torrent.get_status()[
             'torrents']['data']['state_str'] is 'seeding'
 
-
-# test: reannounce
-# test: sleep (and see that fastresume written)
+    @pytest.mark.timeout(10)
+    def test_reannounce(self, session_with_torrent):
+        session_with_torrent.reannounce()
+        while 'm-search' not in ''.join(session_with_torrent
+                                        ._status['alerts']):
+            pass
+        assert True

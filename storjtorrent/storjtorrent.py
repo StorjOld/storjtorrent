@@ -59,7 +59,7 @@ class StorjTorrent(object):
         delete associated files.
 
         :param hash: Torrent info hash for torrent you wish to remove.
-        :type hash: str
+        :type hash: libtorrent.sha1_hash
         :param delete_files: Whether or not you wish to delete associated
                              files.
         :type delete_files: bool

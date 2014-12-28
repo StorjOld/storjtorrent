@@ -1,0 +1,29 @@
+language: python
+python:
+  - 2.7
+  - 3.3
+  - 3.4
+before_install:
+  - 'sudo apt-get install build-essential'
+  - 'sudo apt-get install source python-libtorrent'
+  - 'sudo apt-get build-dep python-libtorrent'
+  - 'wget http://downloads.sourceforge.net/project/libtorrent/libtorrent/libtorrent-rasterbar-1.0.3.tar.gz'
+  - 'tar -zxvf libtorrent-rasterbar-1.0.3.tar.gz'
+  - 'cd libtorrent-rasterbar-1.0.3'
+  - './configure --disable-debug --disable-dependency-tracking --disable-silent-rules --enable-encryption --with-boost-python --enable-dht --with-libiconv --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-python-binding PYTHON=python PYTHON_LDFLAGS="$(python-config --libs)"'
+  - 'sudo make'
+  - 'sudo make install'
+  - 'python setup.py install'
+  - 'export LD_LIBRARY_PATH=/usr/local/lib/'
+  - 'cd ..'
+install:
+  - pip install coverage coveralls
+  - python setup.py install
+script:
+  - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ storjtorrent/"
+  - coverage report -m --include="storjtorrent/*"
+after_success:
+  - coveralls
+notifications:
+  slack:
+    secure: Avmt9x3eMk8f7TpY7OmxvQJTUkpcJjnEZ+aPenh4dO+K6WWmHffK82zK8M+PN5WA7gfffEyPElrfPdMQYNVMmeFzt1S7vu6lvxDh/p/7RnRb3wE6JdpJPngEOf2HFPaFuh9Uqp2zoSleeIHs/n8Qf6HURx5GbzskQ350oWuB06E=

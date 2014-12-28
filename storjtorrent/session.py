@@ -141,8 +141,8 @@ class Session(object):
         torrent_handle = self.session.find_torrent(torrent_hash)
         if torrent_handle.is_valid():
             self.session.remove_torrent(torrent_handle, delete_files)
-            self.handles = [handle for handle in self.handles
-                            if handle is not torrent_handle]
+            self.handles[:] = [handle for handle in self.handles
+                               if handle != torrent_handle]
 
     def add_torrent(self, torrent_location, max_connections=60,
                     max_uploads=-1, seeding=False):

@@ -5,7 +5,7 @@ python:
   - 3.4
 before_install:
   - 'sudo apt-get install build-essential'
-  - 'sudo apt-get install source python-libtorrent'
+  - 'sudo apt-get source python-libtorrent'
   - 'sudo apt-get build-dep python-libtorrent'
   - 'wget http://downloads.sourceforge.net/project/libtorrent/libtorrent/libtorrent-rasterbar-1.0.3.tar.gz'
   - 'tar -zxvf libtorrent-rasterbar-1.0.3.tar.gz'

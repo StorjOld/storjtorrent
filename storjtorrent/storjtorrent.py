@@ -68,6 +68,21 @@ class StorjTorrent(object):
         if len(self.session.handles) is 0:
             self.session.set_alive(False)
 
+    def remove_torrent_by_filename(self, path, delete_files=False):
+        """Remove a torrent from a session by filename and indicate if you want
+        to delete associated files.
+
+        :param path: Path to the torrent file you wish to remove.
+        :type path: str
+        :param delete_files: Whether or not you wish to delete associated
+                             files.
+        :type delete_files: bool
+        """
+        hash = self.get_hash(path)
+        self.session.remove_torrent(hash, delete_files=delete_files)
+        if len(self.session.handles) is 0:
+            self.session.set_alive(False)
+
     def halt_session(self):
         """Manually halt an associated torrent management session."""
         self.session.set_alive(False)

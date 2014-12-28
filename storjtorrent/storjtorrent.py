@@ -101,12 +101,12 @@ class StorjTorrent(object):
         :param torrent_path: The path of the torrent you want to find the hash
                              of.
         :type torrent_path: str
-        :returns: The hash of the indicated torrent.
-        :rtype: str
+        :returns: The hash object of the indicated torrent.
+        :rtype: libtorrent.sha1_hash
         """
         decoded_torrent = lt.bdecode(open(torrent_path, 'rb').read())
         info = lt.torrent_info(decoded_torrent)
-        return str(info.info_hash())
+        return info.info_hash()
 
     @staticmethod
     def generate_torrent(self, shard_directory, piece_size=0,

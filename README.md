@@ -62,7 +62,7 @@ If you are installing inside a virtual environment, you can try the following (a
 
 Install supporting tools and libraries:
 
-    $ apt-get install build-essential
+    $ apt-get install build-essential libboost-all-dev
     $ apt-get source python-libtorrent
     $ apt-get build-dep python-libtorrent
 

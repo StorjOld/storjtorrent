@@ -4,7 +4,7 @@ python:
   - 3.3
   - 3.4
 before_install:
-  - 'sudo apt-get install build-essential'
+  - 'sudo apt-get install build-essential libboost-all-dev'
   - 'wget http://sourceforge.net/projects/boost/files/boost/1.57.0/boost_1_57_0.tar.gz'
   - 'tar -zxvf boost_*.tar.gz'
   - 'cd boost_*'

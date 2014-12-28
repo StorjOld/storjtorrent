@@ -24,14 +24,13 @@
 # SOFTWARE.
 
 from __future__ import print_function
+from .thread_management import IntervalTimer
 from .exception import StorjTorrentError
 from .version import __version__
-import threading
 import libtorrent as lt
 import os
 import sys
 import uuid
-import time
 
 
 class Session(object):
@@ -41,7 +40,7 @@ class Session(object):
     def __init__(self, port_min=6881, port_max=6891, max_download_rate=0,
                  max_upload_rate=0, save_path='.', allocation_mode='compact',
                  proxy_host='', alert_mask=0xfffffff, verbose=False,
-                 status_update_interval=0.5,
+                 status_update_interval=0.05,
                  bootstrap_node='router.bittorrent.com',
                  bootstrap_port=6881):
         """Initialize libtorrent session with supplied parameters.
@@ -98,8 +97,8 @@ class Session(object):
             self.max_upload_rate = -1
         else:
             self.max_upload_rate = 1000 * max_upload_rate
-        self.status_update_interval = status_update_interval
 
+        self.status_update_interval = status_update_interval
         self.save_path = os.path.abspath(save_path)
         self.verbose = verbose
         self.compact_allocation = allocation_mode == 'compact'
@@ -124,10 +123,10 @@ class Session(object):
 
         self.handles = []
         self._status = {'torrents': {}, 'alerts': {}}
-
         self.alive = True
-        self.subthread = threading.Timer(
-            status_update_interval, self._watch_torrents)
+        self.subthread = IntervalTimer(status_update_interval,
+                                       self._watch_torrents)
+        self.subthread.start()
 
     def remove_torrent(self, torrent_hash, delete_files=False):
         """Remove a torrent from being managed by the Session.
@@ -231,6 +230,8 @@ class Session(object):
             self._sleep()
         elif self.alive is False and alive is True:
             self.alive = True
+            self.subthread = IntervalTimer(self.status_update_interval,
+                                           self._watch_torrents)
             self.subthread.start()
 
     def pause(self):
@@ -246,7 +247,7 @@ class Session(object):
     def _sleep(self):
         """Halt session management of torrents and write resume data."""
         self.pause()
-        self.subthread.cancel()
+        self.subthread.stop()
         for handle in self.handles:
             if not handle.is_valid() or not handle.has_metadata():
                 continue
@@ -263,10 +264,9 @@ class Session(object):
         """Watches all torrents assigned to the session and updates status
         dictionary with relevant information.
 
-        The status dictionary is updated at the interval set by
-        status_update_interval. If verbose is set to True on the session
-        object, this method will also print and refresh the associated status
-        information at the given interval.
+        If verbose is set to True on the session object, this method will also
+        print and refresh the associated status information at the given
+        interval.
         """
         state_str = ['queued', 'checking', 'downloading metadata',
                      'downloading', 'finished', 'seeding', 'allocating',
@@ -313,3 +313,5 @@ class Session(object):
                         if (alert.category() and
                                 lt.alert.category_t.error_notification):
                             print(alert)
+
+        return 0

@@ -40,7 +40,7 @@ class Session(object):
     def __init__(self, port_min=6881, port_max=6891, max_download_rate=0,
                  max_upload_rate=0, save_path='.', allocation_mode='compact',
                  proxy_host='', alert_mask=0xfffffff, verbose=False,
-                 status_update_interval=0.05,
+                 status_update_interval=0.25,
                  bootstrap_node='router.bittorrent.com',
                  bootstrap_port=6881):
         """Initialize libtorrent session with supplied parameters.

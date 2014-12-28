@@ -138,16 +138,14 @@ class TestSession:
 
     @pytest.mark.timeout(5)
     def test_add_torrent_and_seed(self, session_with_torrent, capsys):
-        out, err = capsys.readouterr()
-        if session_with_torrent.verbose is True:
-            assert 'Adding' in out
-        else:
-            assert out == ''
         assert len(session_with_torrent.handles) is 1
         while len(session_with_torrent._status['torrents']) is 0:
             pass
         assert session_with_torrent._status['torrents']['data']['state_str']\
             is 'seeding'
+        out, err = capsys.readouterr()
+        if not session_with_torrent.verbose:
+            assert out == ''
 
     @pytest.mark.timeout(5)
     def test_add_torrent_and_download(self, default_session):

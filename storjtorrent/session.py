@@ -26,7 +26,7 @@
 from __future__ import print_function
 from .exception import StorjTorrentError
 from .version import __version__
-from multiprocessing.dummy import Process
+import threading
 import libtorrent as lt
 import os
 import sys
@@ -126,9 +126,8 @@ class Session(object):
         self._status = {'torrents': {}, 'alerts': {}}
 
         self.alive = True
-        self.subthread = Process(target=self._watch_torrents)
-        self.subthread.daemon = True
-        self.subthread.start()
+        self.subthread = threading.Timer(
+            status_update_interval, self._watch_torrents)
 
     def remove_torrent(self, torrent_hash, delete_files=False):
         """Remove a torrent from being managed by the Session.
@@ -232,8 +231,6 @@ class Session(object):
             self._sleep()
         elif self.alive is False and alive is True:
             self.alive = True
-            self.subthread = Process(target=self._watch_torrents)
-            self.subthread.daemon = True
             self.subthread.start()
 
     def pause(self):
@@ -249,6 +246,7 @@ class Session(object):
     def _sleep(self):
         """Halt session management of torrents and write resume data."""
         self.pause()
+        self.subthread.cancel()
         for handle in self.handles:
             if not handle.is_valid() or not handle.has_metadata():
                 continue
@@ -274,7 +272,7 @@ class Session(object):
                      'downloading', 'finished', 'seeding', 'allocating',
                      'checking fastresume']
 
-        while self.alive:
+        if self.alive:
             for handle in self.handles:
                 if handle.has_metadata():
                     name = handle.get_torrent_info().name()[:40]
@@ -303,12 +301,15 @@ class Session(object):
 
                 if self.verbose:
                     sys.stdout.flush()
-                    print(('\r%.2f%% complete (down: %.1f kB/s up: %.1f kB/s peers: %d) %s') % (status.progress * 100,
-                                                                                                status.download_rate / 1000, status.upload_rate / 1000, status.num_peers, state_str[status.state]),
+                    print(('\r%.2f%% complete (down: %.1f kB/s up:'
+                           ' %.1f kB/s peers: %d) %s')
+                          % (status.progress * 100,
+                             status.download_rate / 1000,
+                             status.upload_rate / 1000, status.num_peers,
+                             state_str[status.state]),
                           end=' ')
                     alerts = self.session.pop_alerts()
                     for alert in alerts:
                         if (alert.category() and
                                 lt.alert.category_t.error_notification):
                             print(alert)
-            time.sleep(self.status_update_interval)

@@ -1,5 +1,7 @@
 # StorjTorrent
 
+[![Build Status](https://travis-ci.org/Storj/storjtorrent.svg)](https://travis-ci.org/Storj/storjtorrent) [![Coverage Status](https://img.shields.io/coveralls/Storj/storjtorrent.svg)](https://coveralls.io/r/Storj/storjtorrent)
+
 StorjTorrent is a wrapper library for libtorrent's Python bindings. It allows Storj packages to create torrents, seed files to other Storj nodes, and retrieve files using their hashes.
 
 # Building

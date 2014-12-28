@@ -25,17 +25,40 @@
 
 from storjtorrent import Session
 from storjtorrent import StorjTorrentError
+from storjtorrent import IntervalTimer
+import libtorrent as lt
 import pytest
 import threading
-import multiprocessing
+import os
+import pdb
+
+REMOTE_TORRENT = 'http://releases.ubuntu.com/14.04.1/'
+'ubuntu-14.04.1-desktop-amd64.iso.torrent'
+REMOTE_HASH = 'cb84ccc10f296df72d6c40ba7a07c178a4323a14'
+REMOTE_MAGNET = ''.join(['magnet:?xt=urn:btih:', REMOTE_HASH])
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope='function', params=[True, False])
 def default_session(request):
-    s = Session()
+    os.chdir('tests')
+    s = Session(verbose=request.param)
 
     def fin():
         s.set_alive(False)
+        os.chdir('../')
+    request.addfinalizer(fin)
+    return s
+
+
+@pytest.fixture(scope='function', params=[True, False])
+def session_with_torrent(request):
+    os.chdir('tests')
+    s = Session(verbose=request.param)
+    s.add_torrent('data.torrent', seeding=True)
+
+    def fin():
+        s.set_alive(False)
+        os.chdir('../')
     request.addfinalizer(fin)
     return s
 
@@ -43,8 +66,8 @@ def default_session(request):
 class TestSession:
 
     def session_thread_count(self):
-        return [isinstance(thread, multiprocessing.dummy.DummyProcess) for
-                thread in threading.enumerate()].count(True)
+        return [isinstance(thread, IntervalTimer) for thread
+                in threading.enumerate()].count(True)
 
     @pytest.mark.parametrize('min', [-1, 65526, 'shoe'])
     def test_init_port_min(self, min):
@@ -106,17 +129,69 @@ class TestSession:
         assert self.session_thread_count() is thread_count + 1
         assert default_session.alive is True
 
-# test: remove torrent
-# test: add torrent w/ bad max connections
-# test: add torrent w/ good max connections and seeding
-# test: add torrent w/ magnet and seeding/not seeding:
-# test: add torrent w/ http and https seeding/not seeding:
-# test: add torrent w/ fastresume
-# test: add torrent w/ verbose
+    @pytest.mark.parametrize('max_connections', [1, -2, 'chicken'])
+    def test_add_torrent_bad_max_connections(self, default_session,
+                                             max_connections):
+        torrent_location = 'http://fake.com/fake.torrent'
+        with pytest.raises(StorjTorrentError):
+            default_session.add_torrent(torrent_location, max_connections)
+
+    @pytest.mark.timeout(5)
+    def test_add_torrent_and_seed(self, session_with_torrent, capsys):
+        out, err = capsys.readouterr()
+        if session_with_torrent.verbose is True:
+            assert 'Adding' in out
+        else:
+            assert out == ''
+        assert len(session_with_torrent.handles) is 1
+        while len(session_with_torrent._status['torrents']) is 0:
+            pass
+        assert session_with_torrent._status['torrents']['data']['state_str']\
+            is 'seeding'
+
+    @pytest.mark.timeout(5)
+    def test_add_torrent_and_download(self, default_session):
+        default_session.add_torrent(REMOTE_TORRENT)
+        assert len(default_session.handles) is 1
+        while len(default_session._status['torrents']) is 0:
+            pass
+        assert default_session._status['torrents'].popitem()[1]['state_str']\
+            == 'downloading metadata'
+
+    @pytest.mark.timeout(5)
+    def test_add_magnet_and_download(self, default_session):
+        default_session.add_torrent(REMOTE_MAGNET)
+        assert len(default_session.handles) is 1
+        while len(default_session._status['torrents']) is 0:
+            pass
+        assert default_session._status['torrents'].popitem()[1]['state_str']\
+            == 'downloading metadata'
+
+    def test_pause_torrents(self, session_with_torrent):
+        session_with_torrent.pause()
+        assert session_with_torrent.handles[0].is_paused()
+
+    def test_resume_torrents(self, session_with_torrent):
+        handle = session_with_torrent.handles[0]
+        session_with_torrent.pause()
+        assert handle.is_paused()
+        session_with_torrent.resume()
+        assert not handle.is_paused()
+
+    def test_remove_torrent(self, session_with_torrent):
+        assert len(session_with_torrent.handles) is 1
+        info_hash = lt.torrent_info(
+            lt.bdecode(open('data.torrent', 'rb').read())).info_hash()
+        session_with_torrent.remove_torrent(info_hash)
+        assert len(session_with_torrent.handles) is 0
+
+    @pytest.mark.timeout(5)
+    def test_get_status(self, session_with_torrent):
+        while 'data' not in session_with_torrent.get_status()['torrents']:
+            pass
+        assert session_with_torrent.get_status()[
+            'torrents']['data']['state_str'] is 'seeding'
+
+
 # test: reannounce
-# test: pause
-# test: resume
 # test: sleep (and see that fastresume written)
-# test: get_status returns status
-# test: watch_torrents w/ verbose and w/out verbose  for 20 seconds
-# test: watch_torrents for handles w/ and w/out metadata (e.g. magnets)

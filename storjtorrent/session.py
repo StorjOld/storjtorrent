@@ -236,8 +236,7 @@ class Session(object):
 
     def pause(self):
         """Pauses all torrents handled by this session."""
-        for handle in self.handles:
-            handle.pause()
+        self.session.pause()
 
     def resume(self):
         """Resumes all torrents handled by this session."""

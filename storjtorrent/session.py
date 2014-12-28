@@ -126,14 +126,15 @@ class Session(object):
         self._status = {'torrents': {}, 'alerts': {}}
 
         self.alive = True
-        p = Process(target=self._watch_torrents)
-        p.start()
+        self.subthread = Process(target=self._watch_torrents)
+        self.subthread.daemon = True
+        self.subthread.start()
 
     def remove_torrent(self, torrent_hash, delete_files=False):
         """Remove a torrent from being managed by the Session.
 
         :param torrent_hash: The SHA-1 hash of the torrent you want to delete.
-        :type torrent_hash: str
+        :type torrent_hash: libtorrent.sha1_hash
         :param delete_files: Indicate whether you also want to delete files
                              associated with this torrent.
         :type delete_files: bool
@@ -231,8 +232,9 @@ class Session(object):
             self._sleep()
         elif self.alive is False and alive is True:
             self.alive = True
-            p = Process(target=self._watch_torrents)
-            p.start()
+            self.subthread = Process(target=self._watch_torrents)
+            self.subthread.daemon = True
+            self.subthread.start()
 
     def pause(self):
         """Pauses all torrents handled by this session."""

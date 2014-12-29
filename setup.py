@@ -36,7 +36,7 @@ install_requirements = [
 ]
 
 test_requirements = [
-    'pytest',
+    'pytest>=2.6.4',
     'pytest-pep8',
     'pytest-cache',
     'pytest-timeout',

@@ -128,9 +128,9 @@ Once you create a `StorjTorrent()` object, a torrent management session is autom
 
 ## Removing a Torrent from the Session
 
-    >>> st.remove_torrent([], 'e90e06f2a2461801ac6f7a4b4bccd7f1f16393d3', delete_files=false)
+    >>> st.remove_torrent([], path='../path/to/your.torrent', delete_files=false)
 
-`remove_torrent()` indicates that StorjTorrent should no longer be managing this torrent. You can indicate which torrent to stop managing by passing its corresponding SHA1 hash (which can be determined using `get_hash()`). You also have the option of deleting all associated torrent data files or not.
+`remove_torrent()` indicates that StorjTorrent should no longer be managing this torrent. You can indicate which torrent to stop managing by passing its corresponding SHA1 hash object (which can be determined using `get_hash()`) or path. You also have the option of deleting all associated torrent data files or not.
 
 ## Halting a Session
 

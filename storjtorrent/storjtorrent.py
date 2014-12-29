@@ -54,32 +54,31 @@ class StorjTorrent(object):
             self.session.set_alive(True)
         self.session.add_torrent(torrent_path, seeding=seeding)
 
-    def remove_torrent(self, hash, delete_files=False):
-        """Remove a torrent from a session by hash and indicate if you want to
+    def remove_torrent(self, hash=None, path='', delete_files=False):
+        """Remove a torrent from a session by hash or path and indicate if you want to
         delete associated files.
+
+        Either a hash or a path is required. If a hash is available it
+        will be used instead of a passed path.
 
         :param hash: Torrent info hash for torrent you wish to remove.
         :type hash: libtorrent.sha1_hash
+        :param path:
         :param delete_files: Whether or not you wish to delete associated
                              files.
         :type delete_files: bool
         """
+
+        if path and not hash:
+            hash = self.get_hash(self, path)
+            self.session.remove_torrent(hash, delete_files=delete_files)
+        elif not path and not hash:
+            raise StorjTorrentError(
+                'The hash or path arguments must be defined.')
+
         self.session.remove_torrent(hash, delete_files=delete_files)
         if len(self.session.handles) is 0:
             self.session.set_alive(False)
-
-    def remove_torrent_by_filename(self, path, delete_files=False):
-        """Remove a torrent from a session by filename and indicate if you want
-        to delete associated files.
-
-        :param path: Path to the torrent file you wish to remove.
-        :type path: str
-        :param delete_files: Whether or not you wish to delete associated
-                             files.
-        :type delete_files: bool
-        """
-        hash = self.get_hash([], path)
-        self.remove_torrent([], hash, delete_files=delete_files)
 
     def halt_session(self):
         """Manually halt an associated torrent management session."""

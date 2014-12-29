@@ -74,9 +74,13 @@ class TestStorjTorrent:
         st.add_torrent('data.torrent', isSeeding)
         assert st.session.alive is True
 
-    def test_remove_torrent_by_filename(self, st_with_torrent):
-        st_with_torrent.remove_torrent_by_filename('data.torrent')
+    def test_remove_torrent(self, st_with_torrent):
+        st_with_torrent.remove_torrent([], path='data.torrent')
         assert len(st_with_torrent.session.handles) is 0
+
+    def test_remove_torrent_missing_args(self, st_with_torrent):
+        with pytest.raises(StorjTorrentError):
+            st_with_torrent.remove_torrent([])
 
     def test_halt_session(self, st):
         st.halt_session()

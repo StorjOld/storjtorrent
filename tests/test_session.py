@@ -107,14 +107,14 @@ class TestSession:
 
     def test_init_proxy_host_exists(self, default_session):
         proxy = default_session.session.proxy()
-        assert proxy.type is 0
+        assert proxy.type is lt.proxy_type.none
         assert proxy.hostname is ''
         assert proxy.port is 0
 
     def test_init_proxy_host_not_exists(self):
         s = Session(proxy_host='loveboat.org:8123')
         proxy = s.session.proxy()
-        assert proxy.type is 4
+        assert proxy.type is lt.proxy_type.http
         assert proxy.hostname == 'loveboat.org'
         assert proxy.port == 8123
         s.set_alive(False)

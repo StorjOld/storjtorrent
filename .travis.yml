@@ -4,31 +4,16 @@ python:
   - 3.3
   - 3.4
 before_install:
-  - 'sudo apt-get install build-essential libboost-all-dev'
-  - 'wget http://sourceforge.net/projects/boost/files/boost/1.57.0/boost_1_57_0.tar.gz'
-  - 'tar -zxvf boost_*.tar.gz'
-  - 'cd boost_*'
-  - './bootstrap.sh'
-  - './b2'
-  - 'sudo ./b2 install'
-  - 'cd ..'
-  - 'sudo apt-get source python-libtorrent'
-  - 'sudo apt-get build-dep python-libtorrent'
-  - 'wget http://downloads.sourceforge.net/project/libtorrent/libtorrent/libtorrent-rasterbar-1.0.3.tar.gz'
-  - 'tar -zxvf libtorrent-rasterbar-1.0.3.tar.gz'
-  - 'cd libtorrent-rasterbar-1.0.3'
-  - './configure --disable-debug --disable-dependency-tracking --disable-silent-rules --enable-encryption --with-boost-python --enable-dht --with-libiconv --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-python-binding PYTHON=python PYTHON_LDFLAGS="$(python-config --libs)"'
-  - 'sudo make'
-  - 'sudo make install'
-  - 'python setup.py install'
-  - 'export LD_LIBRARY_PATH=/usr/local/lib/'
-  - 'cd ..'
+  - sudo apt-get update
+  - sudo apt-get install libtorrent-rasterbar7
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then sudo apt-get install python-libtorrent python-dev; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.3 || $TRAVIS_PYTHON_VERSION == 3.4]]; then sudo apt-get install python3-libtorrent python3-dev; fi
 install:
-  - pip install coverage coveralls
-  - python setup.py install
+  - sudo pip install coverage coveralls
+  - sudo python setup.py install
 script:
-  - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ storjtorrent/"
-  - coverage report -m --include="storjtorrent/*"
+  - sudo coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ storjtorrent/"
+  - coverage report -m --isnclude="storjtorrent/*"
 after_success:
   - coveralls
 notifications:

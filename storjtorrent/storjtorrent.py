@@ -79,9 +79,7 @@ class StorjTorrent(object):
         :type delete_files: bool
         """
         hash = self.get_hash(path)
-        self.session.remove_torrent(hash, delete_files=delete_files)
-        if len(self.session.handles) is 0:
-            self.session.set_alive(False)
+        self.remove_torrent(hash, delete_files=delete_files)
 
     def halt_session(self):
         """Manually halt an associated torrent management session."""

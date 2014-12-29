@@ -173,7 +173,7 @@ class TestSession:
     def test_resume_torrents(self, session_with_torrent):
         session_with_torrent.pause()
         assert session_with_torrent.session.is_paused()
-        session_with_torrent.session.resume()
+        session_with_torrent.resume()
         assert not session_with_torrent.session.is_paused()
 
     def test_remove_torrent(self, session_with_torrent):

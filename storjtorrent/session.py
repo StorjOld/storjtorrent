@@ -240,8 +240,7 @@ class Session(object):
 
     def resume(self):
         """Resumes all torrents handled by this session."""
-        for handle in self.handles:
-            handle.resume()
+        self.session.resume()
 
     def _sleep(self):
         """Halt session management of torrents and write resume data."""

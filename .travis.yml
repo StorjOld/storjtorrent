@@ -4,8 +4,9 @@ python:
   - "3.3"
   - "3.4"
 before_install:
+  - sudo add-apt-repository ppa:deluge-team/ppa
   - sudo apt-get update
-  - sudo apt-get install libtorrent-rasterbar6
+  - sudo apt-get install libtorrent-rasterbar7=0.16.17-1ubuntu3~ppa1~precise
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       sudo apt-get install python-libtorrent python-dev;
     else

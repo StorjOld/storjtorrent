@@ -90,21 +90,21 @@ class TestStorjTorrent:
 
     def test_get_torrent_hash(self, st):
         target_hash = '994bab2df24af5297d86d48abf9fb13bc49b8cb2'
-        raw_hash = st.get_hash('data.torrent')
+        raw_hash = st.get_hash([], 'data.torrent')
         encoded_hash = str(raw_hash)
-        assert encoded_hash is target_hash
+        assert encoded_hash == target_hash
 
     @pytest.mark.parametrize('verbose', [True, False, ])
     def test_generate_torrent_bad_piece_size(self, st, verbose):
         with pytest.raises(StorjTorrentError):
-            st.generate_torrent('data', piece_size=1000, verbose=verbose)
+            st.generate_torrent([], 'data', piece_size=1000, verbose=verbose)
 
     @pytest.mark.parametrize('verbose', [True, False, ])
     def test_generate_torrent_empty_dir(self, st, tmpdir, verbose):
         with pytest.raises(StorjTorrentError):
-            st.generate_torrent(tmpdir, verbose=verbose)
+            st.generate_torrent([], str(tmpdir), verbose=verbose)
 
     @pytest.mark.parametrize('verbose', [True, False, ])
     def test_generate_torrent_success(self, st, verbose):
-        st.generate_torrent('data', verbose=verbose)
+        st.generate_torrent([], 'data', verbose=verbose)
         assert os.path.exists('storj.torrent')

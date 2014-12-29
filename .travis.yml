@@ -9,7 +9,8 @@ before_install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       sudo apt-get install python-libtorrent python-dev;
     else
-      sudo apt-get install python3-libtorrent python3-dev;
+      # See if there is a backport of python3-libtorrent for Ubuntu12
+      sudo apt-get install python-libtorrent python3-dev;
     fi
 install:
   - sudo pip install coverage coveralls

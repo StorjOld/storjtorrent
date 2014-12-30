@@ -29,7 +29,7 @@ from setuptools.command.test import test as TestCommand
 with open('storjtorrent/version.py', 'r') as f:
     exec(f.read())
 
-LONG_DESCRIPTION = open('README.md').read()
+LONG_DESCRIPTION = open('README.rst').read()
 
 install_requirements = [
 

@@ -67,8 +67,8 @@ setup(
     name='storjtorrent',
     version=__version__,
     url='https://github.com/Storj/storjtorrent',
-    download_url='https://github.com/storj/storjtorrent/tarball/' +
-        __version__,
+    download_url=''.join(['https://github.com/storj/storjtorrent/tarball/v',
+                          __version__, '-alpha']),
     license=open('LICENSE').read(),
     author='Josh Brandoff',
     author_email='josh@storj.io',

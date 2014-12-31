@@ -173,8 +173,8 @@ Retrieve Hash of Torrent File
     >>> st.get_hash([], '../path/to/your/torrentfile')
     'e90e06f2a2461801ac6f7a4b4bccd7f1f16393d3'
 
-``get_hash()`` retrieves the SHA1 hash of the specified torrent file.
-This hash can be used with a magnet link to let others find and download
+``get_hash()`` retrieves the SHA1 hash of the specified torrent file as a libtorrent sha1_hash object. You can apply `.to_str()
+to the result to get an encoded string. This string can be used with a magnet link to let others find and download
 your torrent via DHT. For example, if the command returns
 ``e90e06f2a2461801ac6f7a4b4bccd7f1f16393d3``, you could use a
 corresponding magnet link of

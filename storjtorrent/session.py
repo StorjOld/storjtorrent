@@ -311,5 +311,3 @@ class Session(object):
                         if (alert.category() and
                                 lt.alert.category_t.error_notification):
                             print(alert)
-
-        return 0

@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2014 Josh Brandoff
+# Copyright (c) 2014-2015 Josh Brandoff
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -230,8 +230,6 @@ class Session(object):
             self._sleep()
         elif self.alive is False and alive is True:
             self.alive = True
-            self.subthread = IntervalTimer(self.status_update_interval,
-                                           self._watch_torrents)
             self.subthread.start()
 
     def pause(self):

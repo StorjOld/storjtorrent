@@ -230,6 +230,8 @@ class Session(object):
             self._sleep()
         elif self.alive is False and alive is True:
             self.alive = True
+            self.subthread = IntervalTimer(self.status_update_interval,
+                                           self._watch_torrents)
             self.subthread.start()
 
     def pause(self):

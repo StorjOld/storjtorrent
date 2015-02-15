@@ -122,3 +122,4 @@ class TestStorjTorrent:
     def test_generate_torrent_abs_path(self, st, verbose):
         st.generate_torrent([], 'data', save_path="/tmp", verbose=verbose)
         assert os.path.exists('/tmp/storj.torrent')
+        

@@ -31,29 +31,35 @@ import os
 
 @pytest.fixture(scope='function')
 def st(request):
+    os.mkdir('tests/pathtest')
     os.chdir('tests')
     s = StorjTorrent()
 
     def fin():
         s.halt_session()
-        for path in ['data.fastresume', 'storj.torrent']:
+        for path in ['data.fastresume', 'storj.torrent',
+                     'pathtest/storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
+        os.rmdir('tests/pathtest')
     request.addfinalizer(fin)
     return s
 
 
 @pytest.fixture(scope='function', params=[True, False])
 def st_with_torrent(request):
+    os.mkdir('tests/pathtest')
     os.chdir('tests')
     st = StorjTorrent()
     st.add_torrent('data.torrent', request.param)
 
     def fin():
         st.halt_session()
-        for path in ['data.fastresume', 'storj.torrent']:
+        for path in ['data.fastresume', 'storj.torrent',
+                     'pathtest/storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
+        os.rmdir('tests/pathtest')
     request.addfinalizer(fin)
     return st
 
@@ -112,3 +118,13 @@ class TestStorjTorrent:
     def test_generate_torrent_success(self, st, verbose):
         st.generate_torrent([], 'data', verbose=verbose)
         assert os.path.exists('storj.torrent')
+
+    @pytest.mark.parametrize('verbose', [True, False, ])
+    def test_generate_torrent_relative_path(self, st, verbose):
+        st.generate_torrent([], 'data', save_path="pathtest", verbose=verbose)
+        assert os.path.exists('pathtest/storj.torrent')
+
+    @pytest.mark.parametrize('verbose', [True, False, ])
+    def test_generate_torrent_abs_path(self, st, verbose):
+        st.generate_torrent([], 'data', save_path="/tmp", verbose=verbose)
+        assert os.path.exists('/tmp/storj.torrent')

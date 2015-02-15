@@ -36,6 +36,7 @@ class StorjTorrent(object):
 
     def __init__(self):
         """Initialize StorjTorrent and associated session."""
+
         self.session = session.Session()
 
     def add_torrent(self, torrent_path, seeding):
@@ -110,7 +111,7 @@ class StorjTorrent(object):
                          pad_size_limit=4 * 1024 * 1024, flags=1,
                          comment='Storj - Be the Cloud.', creator='Storj',
                          private=False, torrent_name='storj.torrent',
-                         verbose=False):
+                         save_path=".", verbose=False):
         """Creates a torrent with specified files.
 
         A torrent is created by determining the files that will be included,
@@ -143,8 +144,11 @@ class StorjTorrent(object):
         :param private: Whether torrent should be private or not. Should be
                         false for DHT.
         :type private: bool
-        :param torrent_name: The filename for your torrent.
+        :param torrent_name: The filename for your torrent. Will default to
+        save_path location unless explicitly stated.
         :type torrent_name: str
+        :param save_path: Save location for file.
+        :type save_path: str
         :param verbose: Indicate if actions should be made verbosely or not.
         :type verbose: bool
         """
@@ -186,6 +190,12 @@ class StorjTorrent(object):
             sys.stderr.write('done!\n')
         else:
             lt.set_piece_hashes(torrent, parent_directory)
+
+        """ Check the save path, if the torrent_name is specified absolutely
+        then ignore it."""
+        if not os.path.isabs(torrent_name):
+            torrent_name = os.path.join(os.path.abspath(save_path),
+                                        torrent_name)
 
         with open(torrent_name, 'wb+') as torrent_file:
             torrent_file.write(lt.bencode(torrent.generate()))

@@ -51,7 +51,7 @@ def st_with_torrent(request):
 
     def fin():
         st.halt_session()
-        for path in ['data.fastresume', 'storj.torrent']:
+        for path in ['data.fastresume', 'storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
     request.addfinalizer(fin)
@@ -112,3 +112,13 @@ class TestStorjTorrent:
     def test_generate_torrent_success(self, st, verbose):
         st.generate_torrent([], 'data', verbose=verbose)
         assert os.path.exists('storj.torrent')
+ 
+    @pytest.mark.parametrize('verbose', [True, False, ])
+    def test_generate_torrent_relative_path(self, st, verbose):
+        st.generate_torrent([], 'data', save_path="path", verbose=verbose)
+        assert os.path.exists('path/storj.torrent')
+
+    @pytest.mark.parametrize('verbose', [True, False, ])
+    def test_generate_torrent_abs_path(self, st, verbose):
+        st.generate_torrent([], 'data', save_path="/tmp", verbose=verbose)
+        assert os.path.exists('/tmp/storj.torrent')

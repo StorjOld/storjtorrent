@@ -160,8 +160,8 @@ Generate a New Torrent File
 torrent file from a specified folder. At a minimum, you will need to
 define the folder location. Additional parameters include
 ``piece_size``, ``pad_size_limit``, ``flags``, ``comment``, ``creator``,
-``private``, ``bootstrap_node``, ``bootstrap_port``, ``torrent_name``
-and ``verbose``.
+``private``, ``bootstrap_node``, ``bootstrap_port``, ``torrent_name``,
+``save_path`` and ``verbose``.
 
 Retrieve Hash of Torrent File
 -----------------------------

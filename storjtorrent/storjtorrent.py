@@ -36,7 +36,7 @@ class StorjTorrent(object):
 
     def __init__(self):
         """Initialize StorjTorrent and associated session."""
-        
+
         self.session = session.Session()
 
     def add_torrent(self, torrent_path, seeding):
@@ -195,7 +195,7 @@ class StorjTorrent(object):
         then ignore it."""
         if not os.path.isabs(torrent_name):
             torrent_name = os.path.join(os.path.abspath(save_path),
-                torrent_name)
+                                        torrent_name)
 
         with open(torrent_name, 'wb+') as torrent_file:
             torrent_file.write(lt.bencode(torrent.generate()))

@@ -31,29 +31,35 @@ import os
 
 @pytest.fixture(scope='function')
 def st(request):
+    os.mkdir('tests/pathtest')
     os.chdir('tests')
     s = StorjTorrent()
 
     def fin():
         s.halt_session()
-        for path in ['data.fastresume', 'storj.torrent']:
+        for path in ['data.fastresume', 'storj.torrent',
+                     'pathtest/storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
+        os.rmdir('tests/pathtest')
     request.addfinalizer(fin)
     return s
 
-
+    
 @pytest.fixture(scope='function', params=[True, False])
 def st_with_torrent(request):
+    os.mkdir('tests/pathtest')
     os.chdir('tests')
     st = StorjTorrent()
     st.add_torrent('data.torrent', request.param)
 
     def fin():
         st.halt_session()
-        for path in ['data.fastresume', 'storj.torrent', '/tmp/storj.torrent']:
+        for path in ['data.fastresume', 'storj.torrent',
+                     'pathtest/storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
+        os.rmdir('tests/pathtest')
     request.addfinalizer(fin)
     return st
 

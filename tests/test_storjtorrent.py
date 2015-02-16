@@ -122,7 +122,7 @@ class TestStorjTorrent:
     @pytest.mark.parametrize('verbose', [True, False, ])
     def test_generate_torrent_relative_path(self, st, verbose):
         st.generate_torrent([], 'data', save_path="pathtest", verbose=verbose)
-        assert os.path.exists('path/storj.torrent')
+        assert os.path.exists('pathtest/storj.torrent')
 
     @pytest.mark.parametrize('verbose', [True, False, ])
     def test_generate_torrent_abs_path(self, st, verbose):

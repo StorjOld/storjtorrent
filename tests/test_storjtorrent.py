@@ -45,7 +45,7 @@ def st(request):
     request.addfinalizer(fin)
     return s
 
-    
+
 @pytest.fixture(scope='function', params=[True, False])
 def st_with_torrent(request):
     os.mkdir('tests/pathtest')

@@ -122,7 +122,11 @@ class TestStorjTorrent:
         assert os.path.exists('storj.torrent')
 
     @pytest.mark.parametrize('save_path', [
+<<<<<<< HEAD
         ('./pathtest'),
+=======
+        ('pathtest'),
+>>>>>>> f2396f301a8c8cf1b959b25603cf1661a222a7c1
         ('/tmp')
     ])
     def test_generate_torrent_path(self, st, save_path):

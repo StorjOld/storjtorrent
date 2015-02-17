@@ -191,11 +191,19 @@ class StorjTorrent(object):
         else:
             lt.set_piece_hashes(torrent, parent_directory)
 
-        """ Check the save path, if the torrent_name is specified absolutely
-        then ignore it."""
-        if not os.path.isabs(torrent_name):
+        """ Check the save path, if it is specified absolutely
+        then parse it."""
+        if os.path.isabs(save_path):
             torrent_name = os.path.join(os.path.abspath(save_path),
                                         torrent_name)
+        else:
+            torrent_name = os.path.join(save_path, torrent_name)
+
+        try:
+            open(torrent_name, 'w')
+        except IOError:
+            raise StorjTorrentError(
+                'Bad torrent save path or name, unable to save.')
 
         with open(torrent_name, 'wb+') as torrent_file:
             torrent_file.write(lt.bencode(torrent.generate()))

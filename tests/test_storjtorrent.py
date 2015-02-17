@@ -38,6 +38,7 @@ def st(request):
     def fin():
         s.halt_session()
         for path in ['data.fastresume', 'storj.torrent',
+                     'test.torrent', '/tmp/test.torrent',
                      'pathtest/storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
@@ -56,6 +57,7 @@ def st_with_torrent(request):
     def fin():
         st.halt_session()
         for path in ['data.fastresume', 'storj.torrent',
+                     'test.torrent', '/tmp/test.torrent',
                      'pathtest/storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
@@ -119,12 +121,21 @@ class TestStorjTorrent:
         st.generate_torrent([], 'data', verbose=verbose)
         assert os.path.exists('storj.torrent')
 
-    @pytest.mark.parametrize('verbose', [True, False, ])
-    def test_generate_torrent_relative_path(self, st, verbose):
-        st.generate_torrent([], 'data', save_path="pathtest", verbose=verbose)
-        assert os.path.exists('pathtest/storj.torrent')
+    @pytest.mark.parametrize('save_path', [
+        ('pathtest'),
+        ('/tmp')
+    ])
+    def test_generate_torrent_path(self, st, save_path):
+        location = save_path + "/storj.torrent"
+        st.generate_torrent([], 'data', save_path=save_path)
+        assert os.path.exists(location)
 
-    @pytest.mark.parametrize('verbose', [True, False, ])
-    def test_generate_torrent_abs_path(self, st, verbose):
-        st.generate_torrent([], 'data', save_path="/tmp", verbose=verbose)
-        assert os.path.exists('/tmp/storj.torrent')
+    @pytest.mark.parametrize('save_path', [
+        ('.'),
+        ('/tmp')
+    ])
+    def test_generate_torrent_name_and_path(self, st, save_path):
+        location = save_path + "/test.torrent"
+        st.generate_torrent([], 'data', torrent_name='test.torrent',
+                            save_path=save_path)
+        assert os.path.exists(location)

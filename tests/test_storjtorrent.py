@@ -121,21 +121,18 @@ class TestStorjTorrent:
         st.generate_torrent([], 'data', verbose=verbose)
         assert os.path.exists('storj.torrent')
 
-    @pytest.mark.parametrize('save_path', [
-        ('./pathtest'),
-        ('/tmp')
-    ])
-    def test_generate_torrent_path(self, st, save_path):
-        location = save_path + "/storj.torrent"
-        st.generate_torrent([], 'data', save_path=save_path)
-        assert os.path.exists(location)
+    @pytest.mark.parametrize('verbose', [(True), (False), ])
+    @pytest.mark.parametrize('save_path', [('./pathtest'), ('/tmp'), ])
+    def test_generate_torrent_path(self, st, save_path, verbose):
+        expected_location = save_path + "/storj.torrent"
+        st.generate_torrent([], 'data', save_path=save_path,
+                            verbose=verbose)
+        assert os.path.exists(expected_location)
 
-    @pytest.mark.parametrize('save_path', [
-        ('.'),
-        ('/tmp')
-    ])
-    def test_generate_torrent_name_and_path(self, st, save_path):
-        location = save_path + "/test.torrent"
+    @pytest.mark.parametrize('verbose', [(True), (False), ])
+    @pytest.mark.parametrize('save_path', [('.'), ('/tmp'), ])
+    def test_generate_torrent_name_and_path(self, st, save_path, verbose):
+        expected_location = save_path + "/test.torrent"
         st.generate_torrent([], 'data', torrent_name='test.torrent',
-                            save_path=save_path)
-        assert os.path.exists(location)
+                            save_path=save_path, verbose=verbose)
+        assert os.path.exists(expected_location)

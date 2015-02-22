@@ -31,7 +31,6 @@ import os
 
 @pytest.fixture(scope='function')
 def st(request):
-    os.mkdir('tests/pathtest')
     os.chdir('tests')
     s = StorjTorrent()
 
@@ -39,17 +38,15 @@ def st(request):
         s.halt_session()
         for path in ['data.fastresume', 'storj.torrent',
                      'test.torrent', '/tmp/test.torrent',
-                     'pathtest/storj.torrent', '/tmp/storj.torrent']:
+                     'storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
-        os.rmdir('tests/pathtest')
     request.addfinalizer(fin)
     return s
 
 
 @pytest.fixture(scope='function', params=[True, False])
 def st_with_torrent(request):
-    os.mkdir('tests/pathtest')
     os.chdir('tests')
     st = StorjTorrent()
     st.add_torrent('data.torrent', request.param)
@@ -58,10 +55,9 @@ def st_with_torrent(request):
         st.halt_session()
         for path in ['data.fastresume', 'storj.torrent',
                      'test.torrent', '/tmp/test.torrent',
-                     'pathtest/storj.torrent', '/tmp/storj.torrent']:
+                     'storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
-        os.rmdir('tests/pathtest')
     request.addfinalizer(fin)
     return st
 
@@ -127,16 +123,16 @@ class TestStorjTorrent:
             st.generate_torrent([], 'data', torrent_name='foo/fails.torrent',
                                 verbose=verbose)
 
-    @pytest.mark.parametrize('verbose', [(True), (False), ])
-    @pytest.mark.parametrize('save_path', [('./pathtest'), ('/tmp'), ])
+    @pytest.mark.parametrize('verbose, save_path', [(True, '.'),
+                             (True, '/tmp'), (False, '.'), (False, '/tmp')])
     def test_generate_torrent_path(self, st, save_path, verbose):
         expected_location = save_path + "/storj.torrent"
         st.generate_torrent([], 'data', save_path=save_path,
                             verbose=verbose)
         assert os.path.exists(expected_location)
 
-    @pytest.mark.parametrize('verbose', [(True), (False), ])
-    @pytest.mark.parametrize('save_path', [('.'), ('/tmp'), ])
+    @pytest.mark.parametrize('verbose, save_path', [(True, '.'),
+                             (True, '/tmp'), (False, '.'), (False, '/tmp')])
     def test_generate_torrent_name_and_path(self, st, save_path, verbose):
         expected_location = save_path + "/test.torrent"
         st.generate_torrent([], 'data', torrent_name='test.torrent',

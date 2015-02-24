@@ -36,7 +36,9 @@ def st(request):
 
     def fin():
         s.halt_session()
-        for path in ['data.fastresume', 'storj.torrent']:
+        for path in ['data.fastresume', 'storj.torrent',
+                     'test.torrent', '/tmp/test.torrent',
+                     'storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
     request.addfinalizer(fin)
@@ -51,7 +53,9 @@ def st_with_torrent(request):
 
     def fin():
         st.halt_session()
-        for path in ['data.fastresume', 'storj.torrent']:
+        for path in ['data.fastresume', 'storj.torrent',
+                     'test.torrent', '/tmp/test.torrent',
+                     'storj.torrent', '/tmp/storj.torrent']:
             os.remove(path) if os.path.exists(path) else None
         os.chdir('../')
     request.addfinalizer(fin)
@@ -112,3 +116,25 @@ class TestStorjTorrent:
     def test_generate_torrent_success(self, st, verbose):
         st.generate_torrent([], 'data', verbose=verbose)
         assert os.path.exists('storj.torrent')
+
+    @pytest.mark.parametrize('verbose', [(True), (False), ])
+    def test_bad_torrent_name(self, st, verbose):
+        with pytest.raises(StorjTorrentError):
+            st.generate_torrent([], 'data', torrent_name='foo/fails.torrent',
+                                verbose=verbose)
+
+    @pytest.mark.parametrize('verbose, save_path', [(True, '.'),
+                             (True, '/tmp'), (False, '.'), (False, '/tmp')])
+    def test_generate_torrent_path(self, st, save_path, verbose):
+        expected_location = save_path + "/storj.torrent"
+        st.generate_torrent([], 'data', save_path=save_path,
+                            verbose=verbose)
+        assert os.path.exists(expected_location)
+
+    @pytest.mark.parametrize('verbose, save_path', [(True, '.'),
+                             (True, '/tmp'), (False, '.'), (False, '/tmp')])
+    def test_generate_torrent_name_and_path(self, st, save_path, verbose):
+        expected_location = save_path + "/test.torrent"
+        st.generate_torrent([], 'data', torrent_name='test.torrent',
+                            save_path=save_path, verbose=verbose)
+        assert os.path.exists(expected_location)
